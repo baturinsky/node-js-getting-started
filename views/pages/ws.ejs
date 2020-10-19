@@ -28,19 +28,22 @@
       let ws = new WebSocket(HOST);
       let el;
       let serverTime = new Date();
-
+      let sendTime = new Date();
+      let sendReceiveDelta = 0;
       let dots = [];
 
       ws.onmessage = function (event) {
         let data = JSON.parse(event.data);
+        let localTime = new Date()          
         if(data.time) {
           let el = document.getElementById("server-time")
           el.innerText = data.time;
           serverTime = new Date(data.time)
-          let localTime = new Date()
-          console.log(localTime - serverTime);
+          console.log(`local/server dt ${localTime - serverTime} ms`);
         }
         if(data.dots){
+          sendReceiveDelta = localTime - sendTime;
+          console.log(`send/receive dt ${sendReceiveDelta}ms`);
           dots = dots.concat(data.dots);
         }
         render();
@@ -56,17 +59,21 @@
       C.onclick = (e) => {
         let dot = [e.offsetX/C.width, e.offsetY/C.height];
         ws.send(JSON.stringify({dots:[dot]}));
+        sendTime = new Date();
       }
 
       function render(){
         let cc = C.getContext("2d");
         cc.fillStyle = "#ffe";
+        cc.font = "14pt Courier"
         cc.clearRect(0,0,C.width,C.height);
         for(let d of dots){
           cc.beginPath()
           cc.arc(d[0]*C.width, d[1]*C.height, r, 0, Math.PI*2);
           cc.fill()
         }
+
+        cc.fillText(`reaction time: ${sendReceiveDelta} ms`, 45, 25)
 
         cc.beginPath()
         cc.arc(r, r, r, 0, Math.PI*2);
@@ -76,6 +83,7 @@
         cc.beginPath()
         cc.arc(r, r, r, a, a+Math.PI)
         cc.fill()
+        
       }      
 
     </script>    
