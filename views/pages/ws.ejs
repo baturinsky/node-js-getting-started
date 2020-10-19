@@ -32,13 +32,13 @@
       let dots = [];
 
       ws.onmessage = function (event) {
-        console.log(event.data);
         let data = JSON.parse(event.data);
         if(data.time) {
           let el = document.getElementById("server-time")
           el.innerText = data.time;
           serverTime = new Date(data.time)
-          console.log(serverTime);
+          let localTime = new Date()
+          console.log(localTime - serverTime);
         }
         if(data.dots){
           dots = dots.concat(data.dots);
