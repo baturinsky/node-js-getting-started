@@ -58,6 +58,6 @@ wsServer.on('connection', (ws) => {
 
 setInterval(() => {
   wsServer.clients.forEach((client) => {
-    client.send(JSON.stringify({time:new Date().toTimeString()}));
+    client.send(JSON.stringify({time:new Date().toISOString()}));
   });
 }, 1000);

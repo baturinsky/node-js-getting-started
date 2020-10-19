@@ -24,9 +24,10 @@
     </div>
 
     <script>
-      var HOST = location.origin.replace(/^http/, "ws");
-      var ws = new WebSocket(HOST);
-      var el;
+      let HOST = location.origin.replace(/^http/, "ws");
+      let ws = new WebSocket(HOST);
+      let el;
+      let serverTime = new Date();
 
       let dots = [];
 
@@ -36,11 +37,13 @@
         if(data.time) {
           let el = document.getElementById("server-time")
           el.innerText = data.time;
+          serverTime = new Date(data.time)
+          console.log(serverTime);
         }
         if(data.dots){
           dots = dots.concat(data.dots);
-          render();
         }
+        render();
       };
 
       /**@type HTMLCanvasElement*/
@@ -64,6 +67,15 @@
           cc.arc(d[0]*C.width, d[1]*C.height, r, 0, Math.PI*2);
           cc.fill()
         }
+
+        cc.beginPath()
+        cc.arc(r, r, r, 0, Math.PI*2);
+        cc.fill()
+        cc.fillStyle = "#222";
+        let a = Math.PI * 2 * (serverTime.getSeconds() / 10);
+        cc.beginPath()
+        cc.arc(r, r, r, a, a+Math.PI)
+        cc.fill()
       }      
 
     </script>    
