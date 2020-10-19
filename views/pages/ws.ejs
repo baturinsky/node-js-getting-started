@@ -24,7 +24,7 @@
     </div>
 
     <script>
-      let HOST = location.origin.replace(/^http/, "ws");
+      let HOST = location.origin.replace(/^http/, location.hostname=="localhost"?"ws":"wss");
       let ws = new WebSocket(HOST);
       let el;
       let serverTime = new Date();
