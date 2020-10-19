@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      #C {
+        background-color: #222;
+      }
+      #main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+
+  </head>
+
+  <body>
+    <div id="main">
+      <canvas id="C"></canvas>
+      <div id="server-time"></div>
+    </div>
+
+    <script>
+      var HOST = location.origin.replace(/^http/, "ws");
+      var ws = new WebSocket(HOST);
+      var el;
+
+      let dots = [];
+
+      ws.onmessage = function (event) {
+        console.log(event.data);
+        let data = JSON.parse(event.data);
+        if(data.time) {
+          let el = document.getElementById("server-time")
+          el.innerText = data.time;
+        }
+        if(data.dots){
+          dots = dots.concat(data.dots);
+          render();
+        }
+      };
+
+      /**@type HTMLCanvasElement*/
+      let C = document.getElementById('C');
+      C.width = window.innerWidth * 0.9;
+      C.height = window.innerHeight * 0.9;
+      let r = (C.width + C.height)/200;
+      
+      /**@param {MouseEvent} e*/
+      C.onclick = (e) => {
+        let dot = [e.offsetX/C.width, e.offsetY/C.height];
+        ws.send(JSON.stringify({dots:[dot]}));
+      }
+
+      function render(){
+        let cc = C.getContext("2d");
+        cc.fillStyle = "#ffe";
+        cc.clearRect(0,0,C.width,C.height);
+        for(let d of dots){
+          cc.beginPath()
+          cc.arc(d[0]*C.width, d[1]*C.height, r, 0, Math.PI*2);
+          cc.fill()
+        }
+      }      
+
+    </script>    
+  </body>
+</html>
